@@ -27,7 +27,13 @@ export const Hero = () => {
 
   const handleGetStarted = () => {
     console.log('Get Started clicked, user:', user);
-    navigate('/auth');
+    if (user) {
+      // Se já está logado, vai para uma área de dashboard/funcionalidades
+      navigate('/'); // Pode ser mudado para '/dashboard' quando tiver
+    } else {
+      // Se não está logado, vai para autenticação
+      navigate('/auth');
+    }
   };
 
   const handleGetResources = () => {
@@ -43,14 +49,14 @@ export const Hero = () => {
       
       <div className="container mx-auto text-center relative z-10">
         <div className="max-w-4xl mx-auto animate-fade-in">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-center">
             Build Your{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
               Next Big Thing
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed text-center">
             The ultimate SaaS platform that helps you scale from idea to millions of users. 
             Get started with premium features, resources, and expert guidance.
           </p>
@@ -61,7 +67,7 @@ export const Hero = () => {
               className="text-lg px-8 py-6 gradient-primary text-background glow-primary hover:scale-105 transition-all duration-300"
               onClick={handleGetStarted}
             >
-              Start Building Now
+              {user ? 'Continue Building' : 'Start Building Now'}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             
@@ -76,7 +82,7 @@ export const Hero = () => {
             </Button>
           </div>
           
-          <div className="mt-12 text-sm text-muted-foreground">
+          <div className="mt-12 text-sm text-muted-foreground text-center">
             <p>Join 10,000+ builders who trust our platform</p>
           </div>
         </div>

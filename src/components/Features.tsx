@@ -39,13 +39,13 @@ export const Features = () => {
     <section className="py-20 px-4">
       <div className="container mx-auto">
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-center">
             Why Choose{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
               Our Platform
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-center">
             Everything you need to build, scale, and succeed in today's competitive market.
           </p>
         </div>

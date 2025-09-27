@@ -104,13 +104,13 @@ export const Pricing = () => {
     <section className="py-20 px-4 bg-card/20">
       <div className="container mx-auto">
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-center">
             Simple{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
               Transparent Pricing
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 text-center">
             Choose the perfect plan for your needs. Upgrade or downgrade at any time.
           </p>
           
