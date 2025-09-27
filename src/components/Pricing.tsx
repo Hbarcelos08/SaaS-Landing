@@ -1,60 +1,104 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const plans = [
-  {
-    name: "Starter",
-    description: "Perfect for getting started",
-    monthlyPrice: 29,
-    annualPrice: 290,
-    features: [
-      "Up to 5 projects",
-      "Basic analytics",
-      "Email support",
-      "Standard security",
-      "1GB storage"
-    ]
-  },
-  {
-    name: "Professional",
-    description: "Best for growing businesses",
-    monthlyPrice: 79,
-    annualPrice: 790,
-    popular: true,
-    features: [
-      "Unlimited projects",
-      "Advanced analytics",
-      "Priority support",
-      "Enhanced security",
-      "50GB storage",
-      "Team collaboration",
-      "API access"
-    ]
-  },
-  {
-    name: "Enterprise",
-    description: "For large-scale operations",
-    monthlyPrice: 199,
-    annualPrice: 1990,
-    features: [
-      "Everything in Professional",
-      "Custom integrations",
-      "24/7 phone support",
-      "Enterprise security",
-      "Unlimited storage",
-      "Advanced team management",
-      "SLA guarantee",
-      "Dedicated account manager"
-    ]
-  }
-];
+import { MockPayment } from "./MockPayment";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Pricing = () => {
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [showPayment, setShowPayment] = useState(false);
+  const [user, setUser] = useState(null);
+  const { toast } = useToast();
   const [isAnnual, setIsAnnual] = useState(false);
+
+  // Check authentication status
+  React.useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+  }, []);
+
+  const handlePlanSelect = (plan: any) => {
+    if (!user) {
+      toast({
+        title: "Login Necessário",
+        description: "Faça login para assinar um plano",
+        variant: "destructive"
+      });
+      window.location.href = '/auth';
+      return;
+    }
+    setSelectedPlan(plan);
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    toast({
+      title: "Assinatura Ativada! 🎉",
+      description: "Bem-vindo ao seu novo plano!",
+    });
+    // Redirect to dashboard or main page
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1000);
+  };
+
+  const plans = [
+    {
+      name: "Starter",
+      description: "Perfect for getting started",
+      price: "R$ 29",
+      originalPrice: "R$ 49",
+      monthlyPrice: 29,
+      annualPrice: 290,
+      features: [
+        "Up to 5 projects",
+        "Basic analytics",
+        "Email support",
+        "Standard security",
+        "1GB storage"
+      ]
+    },
+    {
+      name: "Professional",
+      description: "Best for growing businesses",
+      price: "R$ 79",
+      originalPrice: "R$ 99",
+      monthlyPrice: 79,
+      annualPrice: 790,
+      popular: true,
+      features: [
+        "Unlimited projects",
+        "Advanced analytics",
+        "Priority support",
+        "Enhanced security",
+        "50GB storage",
+        "Team collaboration",
+        "API access"
+      ]
+    },
+    {
+      name: "Enterprise",
+      description: "For large-scale operations",
+      price: "R$ 199",
+      originalPrice: "R$ 299",
+      monthlyPrice: 199,
+      annualPrice: 1990,
+      features: [
+        "Everything in Professional",
+        "Custom integrations",
+        "24/7 phone support",
+        "Enterprise security",
+        "Unlimited storage",
+        "Advanced team management",
+        "SLA guarantee",
+        "Dedicated account manager"
+      ]
+    }
+  ];
 
   return (
     <section className="py-20 px-4 bg-card/20">
@@ -116,11 +160,16 @@ export const Pricing = () => {
                 <p className="text-muted-foreground">{plan.description}</p>
                 <div className="mt-6">
                   <span className="text-4xl font-bold">
-                    ${isAnnual ? plan.annualPrice : plan.monthlyPrice}
+                    R$ {isAnnual ? plan.annualPrice : plan.monthlyPrice}
                   </span>
                   <span className="text-muted-foreground">
-                    /{isAnnual ? 'year' : 'month'}
+                    /{isAnnual ? 'ano' : 'mês'}
                   </span>
+                  {plan.originalPrice && (
+                    <div className="text-sm text-muted-foreground line-through">
+                      {plan.originalPrice}
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               
@@ -134,23 +183,31 @@ export const Pricing = () => {
                   ))}
                 </ul>
                 
-                <Link to="/auth" className="block">
-                  <Button 
-                    className={`w-full ${
-                      plan.popular 
-                        ? 'gradient-primary text-background glow-primary' 
-                        : 'border-primary/50 hover:bg-primary/10'
-                    }`}
-                    variant={plan.popular ? 'default' : 'outline'}
-                  >
-                    Get Started
-                  </Button>
-                </Link>
+                <Button 
+                  className={`w-full ${
+                    plan.popular 
+                      ? 'gradient-primary text-background glow-primary' 
+                      : 'border-primary/50 hover:bg-primary/10'
+                  }`}
+                  variant={plan.popular ? 'default' : 'outline'}
+                  onClick={() => handlePlanSelect(plan)}
+                >
+                  {plan.name === 'Starter' ? 'Começar Grátis' : 'Assinar Agora'}
+                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
       </div>
+
+      {showPayment && selectedPlan && (
+        <MockPayment
+          plan={selectedPlan}
+          isOpen={showPayment}
+          onClose={() => setShowPayment(false)}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
     </section>
   );
 };

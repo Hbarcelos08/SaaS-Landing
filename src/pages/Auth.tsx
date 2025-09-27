@@ -1,17 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { User } from '@supabase/supabase-js';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
+
+  // Check if user is already logged in and redirect
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+        window.location.href = '/';
+      }
+    };
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          setUser(session.user);
+          toast({
+            title: "Login realizado com sucesso! ✅",
+            description: "Redirecionando para a página inicial...",
+          });
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1000);
+        }
+      }
+    );
+
+    checkUser();
+
+    return () => subscription.unsubscribe();
+  }, [toast]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,8 +61,8 @@ export default function Auth() {
         });
         if (error) throw error;
         toast({
-          title: "Check your email",
-          description: "We've sent you a confirmation link.",
+          title: "Conta criada com sucesso! ✅",
+          description: "Verifique seu email para confirmar a conta.",
         });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -37,15 +70,23 @@ export default function Auth() {
           password,
         });
         if (error) throw error;
-        toast({
-          title: "Welcome back!",
-          description: "You've been signed in successfully.",
-        });
+        // Success message will be handled by auth state change listener
       }
     } catch (error: any) {
+      let errorMessage = error.message;
+      
+      // Handle common authentication errors
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = 'Email ou senha incorretos. Verifique seus dados.';
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = 'Email não confirmado. Verifique sua caixa de entrada.';
+      } else if (error.message.includes('User already registered')) {
+        errorMessage = 'Este email já está cadastrado. Tente fazer login.';
+      }
+
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Erro",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
