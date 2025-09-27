@@ -1,8 +1,43 @@
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Download } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { User } from '@supabase/supabase-js';
 
 export const Hero = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check current user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleGetStarted = () => {
+    if (user) {
+      // User is logged in, redirect to dashboard/main functionality
+      navigate('/');
+    } else {
+      // User not logged in, redirect to auth
+      navigate('/auth');
+    }
+  };
+
+  const handleGetResources = () => {
+    navigate('/downloads');
+  };
   return (
     <section className="relative pt-32 pb-20 px-4 overflow-hidden">
       {/* Background gradients */}
@@ -25,19 +60,24 @@ export const Hero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up">
-            <Link to="/auth">
-              <Button size="lg" className="text-lg px-8 py-6 gradient-primary text-background glow-primary hover:scale-105 transition-all duration-300">
-                Start Building Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="text-lg px-8 py-6 gradient-primary text-background glow-primary hover:scale-105 transition-all duration-300"
+              onClick={handleGetStarted}
+            >
+              {user ? 'Continue Building' : 'Start Building Now'}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
             
-            <Link to="/downloads">
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary/50 hover:bg-primary/10 hover:glow-primary transition-all duration-300">
-                <Download className="mr-2 h-5 w-5" />
-                Get Resources
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-lg px-8 py-6 border-primary/50 hover:bg-primary/10 hover:glow-primary transition-all duration-300"
+              onClick={handleGetResources}
+            >
+              <Download className="mr-2 h-5 w-5" />
+              Get Resources
+            </Button>
           </div>
           
           <div className="mt-12 text-sm text-muted-foreground">
