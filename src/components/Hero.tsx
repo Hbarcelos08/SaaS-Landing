@@ -26,16 +26,12 @@ export const Hero = () => {
   }, []);
 
   const handleGetStarted = () => {
-    if (user) {
-      // User is logged in, redirect to dashboard/main functionality
-      navigate('/');
-    } else {
-      // User not logged in, redirect to auth
-      navigate('/auth');
-    }
+    console.log('Get Started clicked, user:', user);
+    navigate('/auth');
   };
 
   const handleGetResources = () => {
+    console.log('Get Resources clicked');
     navigate('/downloads');
   };
   return (
@@ -65,7 +61,7 @@ export const Hero = () => {
               className="text-lg px-8 py-6 gradient-primary text-background glow-primary hover:scale-105 transition-all duration-300"
               onClick={handleGetStarted}
             >
-              {user ? 'Continue Building' : 'Start Building Now'}
+              Start Building Now
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             

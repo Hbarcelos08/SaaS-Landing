@@ -92,12 +92,9 @@ export const Navbar = () => {
                 <Link to="/auth">
                   <Button variant="ghost">Sign In</Button>
                 </Link>
-                <Button 
-                  className="gradient-primary text-background"
-                  onClick={handleGetStarted}
-                >
-                  Get Started
-                </Button>
+                <Link to="/auth">
+                  <Button className="gradient-primary text-background">Get Started</Button>
+                </Link>
               </>
             )}
           </div>
@@ -154,15 +151,9 @@ export const Navbar = () => {
                     <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full">Sign In</Button>
                     </Link>
-                    <Button 
-                      className="w-full gradient-primary text-background"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        handleGetStarted();
-                      }}
-                    >
-                      Get Started
-                    </Button>
+                    <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button className="w-full gradient-primary text-background">Get Started</Button>
+                    </Link>
                   </>
                 )}
               </div>
